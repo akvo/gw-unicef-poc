@@ -1,0 +1,1363 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Akvo · GW-Connector — Puntland</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Mulish:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,400;1,600;1,800&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    /* Akvo brand */
+    --akvo:        #4851A4;
+    --akvo-dark:   #3B4289;
+    --akvo-deep:   #2B2E6B;
+    --akvo-ink:    #24243A;
+
+    /* neutrals */
+    --bg:          #EBECEE;
+    --bg-tint:     #F2F2F4;
+    --card:        #FFFFFF;
+    --ink:         #1E1E28;
+    --ink-soft:    #4A4A57;
+    --ink-muted:   #8A8A96;
+    --rule:        rgba(30, 30, 40, 0.09);
+    --rule-mid:    rgba(30, 30, 40, 0.18);
+
+    /* data accents — restrained, deck-aligned */
+    --warm:        #A0431E;
+    --warm-deep:   #6C2D10;
+    --warm-bg:     #F1E2D6;
+
+    --norm:        #3A3580;    /* darker cousin of akvo for normalization */
+    --norm-deep:   #23205A;
+    --norm-bg:     #DEDCEE;
+
+    --teal:        #3D7F84;    /* muted design accent */
+    --teal-deep:   #1E5055;
+    --teal-bg:     #DDECED;
+
+    /* highlight (bullet pill) */
+    --glow:        #F0A92A;
+    --glow-line:   #B37516;
+    --glow-bg:     rgba(240, 169, 42, 0.22);
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body { height: 100%; }
+
+  body {
+    font-family: "Mulish", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    background: var(--bg);
+    color: var(--ink);
+    overflow: hidden;
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+  }
+
+  /* ═════════ HEADER (Akvo blue strip) ═════════ */
+  .topbar {
+    position: relative;
+    z-index: 30;
+    height: 72px;
+    padding: 0 28px;
+    background: var(--akvo);
+    color: #fff;
+    display: grid;
+    grid-template-columns: auto 1fr auto;
+    align-items: center;
+    gap: 28px;
+  }
+
+  /* left: doc meta */
+  .doc-meta {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+  }
+  .doc-mark {
+    display: grid;
+    place-items: center;
+    width: 36px; height: 36px;
+    background: #fff;
+    color: var(--akvo);
+    font-weight: 900;
+    font-size: 22px;
+    line-height: 1;
+    border-radius: 3px;
+    letter-spacing: -0.02em;
+    font-feature-settings: "ss01";
+  }
+  .doc-lines {
+    display: flex;
+    flex-direction: column;
+    line-height: 1.12;
+  }
+  .doc-lines .k {
+    font-weight: 800;
+    font-size: 13px;
+    letter-spacing: 0.02em;
+    color: #fff;
+  }
+  .doc-lines .v {
+    font-weight: 500;
+    font-size: 11px;
+    color: rgba(255,255,255,0.72);
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+  }
+
+  /* center: title with inline stamps */
+  .title {
+    justify-self: center;
+    color: #fff;
+    font-weight: 800;
+    font-size: 22px;
+    line-height: 1.1;
+    letter-spacing: -0.012em;
+    white-space: nowrap;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .stamp {
+    display: inline-flex;
+    align-items: center;
+    padding: 6px 12px 6px;
+    background: #fff;
+    color: var(--akvo);
+    font-weight: 900;
+    line-height: 1;
+    letter-spacing: -0.005em;
+  }
+  .title .stamp { font-size: 22px; padding: 7px 12px 6px; }
+
+  /* right buttons */
+  .topbar-right {
+    display: inline-flex;
+    gap: 8px;
+    align-items: center;
+  }
+  .btn {
+    font-family: "Mulish", sans-serif;
+    font-weight: 700;
+    font-size: 12.5px;
+    letter-spacing: 0.01em;
+    padding: 9px 14px 8px;
+    background: transparent;
+    color: #fff;
+    border: 1.5px solid rgba(255,255,255,0.85);
+    cursor: pointer;
+    border-radius: 3px;
+    display: inline-flex;
+    align-items: center;
+    gap: 9px;
+    transition: background 150ms ease, color 150ms ease, border-color 150ms ease;
+  }
+  .btn::after {
+    content: attr(data-icon);
+    font-weight: 700;
+    font-size: 13px;
+    line-height: 1;
+    display: inline-block;
+  }
+  .btn:hover {
+    background: #fff;
+    color: var(--akvo);
+    border-color: #fff;
+  }
+  .btn.is-active {
+    background: #fff;
+    color: var(--akvo);
+    border-color: #fff;
+  }
+
+  /* ═════════ STAGE ═════════ */
+  .stage {
+    position: relative;
+    z-index: 1;
+    height: calc(100vh - 72px);
+    display: flex;
+    align-items: stretch;
+    padding: 28px 36px 52px;
+    gap: 80px;
+    background: var(--bg);
+  }
+
+  .panel {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    background: var(--card);
+    border: 1px solid var(--rule);
+    border-radius: 2px;
+    padding: 0;
+  }
+  .panel-left  { flex: 0 0 40%; }
+  .panel-right { flex: 1 1 auto; min-width: 0; }
+
+  /* panel header as Akvo-style stamp strip */
+  .panel-head {
+    display: flex;
+    align-items: center;
+    padding: 0;
+    border-bottom: 1px solid var(--rule);
+  }
+  .panel-stamp {
+    display: inline-flex;
+    align-items: baseline;
+    gap: 10px;
+    background: var(--akvo);
+    color: #fff;
+    padding: 12px 18px 11px;
+    font-weight: 900;
+    font-size: 15px;
+    letter-spacing: -0.005em;
+  }
+  .panel-stamp .num {
+    font-weight: 800;
+    font-size: 12px;
+    letter-spacing: 0.16em;
+    opacity: 0.82;
+    text-transform: uppercase;
+  }
+  .panel-sub {
+    font-weight: 400;
+    font-style: italic;
+    font-size: 13px;
+    color: var(--ink-soft);
+    padding: 12px 18px;
+    border-left: 1px solid var(--rule);
+  }
+  .panel-meta {
+    margin-left: auto;
+    padding: 12px 18px;
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 10.5px;
+    color: var(--ink-muted);
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+  }
+
+  .panel-body {
+    flex: 1 1 auto;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px 22px;
+    min-height: 0;
+  }
+  .diagram {
+    width: 100%;
+    max-height: 100%;
+    height: auto;
+    display: block;
+    overflow: visible;
+  }
+
+  /* ═════════ SVG TOKENS ═════════ */
+  .col-label {
+    fill: var(--ink-muted);
+    font-family: "Mulish", sans-serif;
+    font-size: 10.5px;
+    font-weight: 800;
+    letter-spacing: 0.14em;
+  }
+  .col-divider { stroke: var(--rule-mid); stroke-width: 0.5; }
+  .row-arrow, .flow-arrow {
+    stroke: var(--ink-muted);
+    stroke-width: 1.4;
+    fill: none;
+  }
+
+  .framework-border {
+    fill: none;
+    stroke: var(--rule-mid);
+    stroke-width: 0.8;
+    stroke-dasharray: 4 3;
+  }
+  .framework-label {
+    fill: var(--ink);
+    font-family: "Mulish", sans-serif;
+    font-size: 11px;
+    font-weight: 800;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+  }
+
+  /* rects */
+  .rect-ch, .rect-resp, .rect-src, .rect-arch, .rect-norm, .rect-out {
+    stroke-width: 1;
+    transition: stroke-width 300ms ease, filter 300ms ease;
+  }
+  .rect-ch   { fill: var(--card);   stroke: var(--warm-deep); }
+  .rect-resp { fill: var(--akvo);   stroke: var(--akvo-deep); }
+  .rect-src  { fill: var(--card);   stroke: var(--warm-deep); }
+  .rect-arch { fill: var(--akvo);   stroke: var(--akvo-deep); }
+  .rect-norm { fill: var(--norm);   stroke: var(--norm-deep); }
+  .rect-out  { fill: var(--bg-tint);stroke: var(--akvo-deep); }
+
+  /* text roles */
+  .t-title-ch   { fill: var(--warm-deep);   font-family: "Mulish", sans-serif;     font-size: 14px;   font-weight: 800; letter-spacing: -0.005em; }
+  .t-sub-ch     { fill: var(--warm);        font-family: "IBM Plex Mono", monospace; font-size: 10px;   font-weight: 500; letter-spacing: 0.01em; }
+  .t-title-resp { fill: #fff;               font-family: "Mulish", sans-serif;     font-size: 14px;   font-weight: 800; letter-spacing: -0.005em; }
+  .t-sub-resp   { fill: rgba(255,255,255,0.85); font-family: "IBM Plex Mono", monospace; font-size: 10px; font-weight: 500; letter-spacing: 0.01em; }
+  .t-title-norm { fill: #fff;               font-family: "Mulish", sans-serif;     font-size: 14px;   font-weight: 800; letter-spacing: -0.005em; }
+  .t-sub-norm   { fill: rgba(255,255,255,0.88); font-family: "IBM Plex Mono", monospace; font-size: 10px; font-weight: 500; letter-spacing: 0.01em; }
+  .t-title-out  { fill: var(--akvo-deep);   font-family: "Mulish", sans-serif;     font-size: 14px;   font-weight: 800; letter-spacing: -0.005em; }
+  .t-sub-out    { fill: var(--akvo);        font-family: "IBM Plex Mono", monospace; font-size: 10px;   font-weight: 500; letter-spacing: 0.01em; }
+
+  .legend-text {
+    fill: var(--ink-soft);
+    font-family: "Mulish", sans-serif;
+    font-size: 10.5px;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+  }
+
+  /* row index (Mulish heavy, big) */
+  .row-idx {
+    fill: var(--ink-muted);
+    font-family: "Mulish", sans-serif;
+    font-weight: 900;
+    font-size: 13px;
+    letter-spacing: 0.02em;
+  }
+
+  .ch-row, .arch-box {
+    transition: opacity 200ms ease;
+  }
+  .ch-row { cursor: pointer; }
+  .ch-row:hover .rect-ch { stroke-width: 1.4; }
+  .ch-row:hover .row-idx { fill: var(--warm-deep); }
+
+  /* bullet pills */
+  .bullet-pill {
+    fill: var(--glow-bg);
+    stroke: var(--glow-line);
+    stroke-width: 0.9;
+    opacity: 0;
+    transition: opacity 260ms ease;
+    pointer-events: none;
+  }
+  .bullet-pill-tick {
+    fill: var(--glow);
+    opacity: 0;
+    transition: opacity 260ms ease 60ms;
+    pointer-events: none;
+  }
+  .bullet-pill.is-emphasized,
+  .bullet-pill-tick.is-emphasized { opacity: 1; }
+
+  /* state: active / dimmed */
+  .stage[data-active="true"] .dimmable:not(.is-active) {
+    opacity: 0.2;
+    pointer-events: none;
+    transition: opacity 200ms ease;
+  }
+
+  .ch-row.is-active .rect-ch {
+    stroke-width: 2;
+    filter: drop-shadow(0 0 4px rgba(160, 67, 30, 0.55));
+  }
+  .ch-row.is-active .rect-resp {
+    stroke-width: 2;
+    filter: drop-shadow(0 0 5px rgba(72, 81, 164, 0.55));
+  }
+  .ch-row.is-active .row-idx { fill: var(--warm-deep); }
+
+  .arch-box.is-active .rect-arch {
+    stroke-width: 2;
+    filter: drop-shadow(0 0 5px rgba(72, 81, 164, 0.6));
+  }
+  .arch-box.is-active .rect-norm {
+    stroke-width: 2;
+    filter: drop-shadow(0 0 5px rgba(58, 53, 128, 0.65));
+  }
+
+  /* ═════════ CONNECTOR OVERLAY ═════════ */
+  .connector-layer {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    z-index: 5;
+    overflow: visible;
+  }
+  .connector-path {
+    fill: none;
+    stroke: url(#connector-gradient);
+    stroke-width: 2;
+    stroke-linecap: round;
+    opacity: 0;
+  }
+  .connector-path.drawn { opacity: 1; }
+  .connector-origin, .connector-ring {
+    opacity: 0;
+    transition: opacity 200ms ease;
+  }
+  .connector-origin.drawn,
+  .connector-ring.drawn { opacity: 1; }
+  .connector-origin { fill: var(--warm); }
+  .connector-ring   { fill: none; stroke: var(--warm); stroke-width: 1; }
+
+  /* ═════════ CALLOUT — Akvo stamp style ═════════ */
+  .callout {
+    position: absolute;
+    z-index: 6;
+    pointer-events: none;
+    opacity: 0;
+    transform: translate(-50%, -6px);
+    transition: opacity 260ms ease, transform 260ms ease;
+    font-family: "Mulish", sans-serif;
+  }
+  .callout.visible {
+    opacity: 1;
+    transform: translate(-50%, 0);
+  }
+  .callout-leader {
+    position: absolute;
+    left: 50%;
+    bottom: 100%;
+    width: 1.5px;
+    height: 12px;
+    background: var(--akvo);
+    transform: translateX(-0.75px);
+  }
+  .callout-body {
+    display: inline-flex;
+    align-items: stretch;
+    background: var(--card);
+    border: 1px solid var(--akvo);
+    box-shadow: 0 6px 18px -8px rgba(30,30,40,0.22);
+    white-space: nowrap;
+  }
+  .callout-tag {
+    background: var(--akvo);
+    color: #fff;
+    font-weight: 900;
+    font-size: 10px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    padding: 9px 12px 8px;
+    display: inline-flex;
+    align-items: center;
+  }
+  .callout-text {
+    padding: 8px 14px 7px;
+    color: var(--ink);
+    font-size: 12.5px;
+    font-weight: 500;
+    display: inline-flex;
+    align-items: center;
+  }
+  .callout-text .mono-hi {
+    font-family: "IBM Plex Mono", monospace;
+    font-weight: 600;
+    font-size: 11.5px;
+    color: var(--akvo);
+    background: rgba(72, 81, 164, 0.10);
+    padding: 1px 6px;
+    margin: 0 1px;
+    letter-spacing: 0.01em;
+  }
+
+  /* ═════════ HINT + MONOGRAM ═════════ */
+  .hint {
+    position: absolute;
+    left: 50%;
+    bottom: 16px;
+    transform: translateX(-50%);
+    font-family: "Mulish", sans-serif;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--ink-muted);
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    background: var(--bg);
+    padding: 3px 12px;
+    z-index: 4;
+    transition: opacity 200ms ease;
+  }
+  .hint em {
+    font-style: normal;
+    color: var(--akvo);
+    font-weight: 800;
+  }
+  .hint::before, .hint::after {
+    content: "";
+    width: 24px; height: 1px;
+    background: var(--rule-mid);
+  }
+  .stage[data-active="true"] .hint { opacity: 0; }
+
+  .akvo-mark {
+    position: absolute;
+    right: 24px;
+    bottom: 20px;
+    width: 36px; height: 36px;
+    background: var(--akvo);
+    color: #fff;
+    font-family: "Mulish", sans-serif;
+    font-weight: 900;
+    font-size: 22px;
+    line-height: 1;
+    display: grid;
+    place-items: center;
+    border-radius: 3px;
+    letter-spacing: -0.02em;
+    z-index: 4;
+    pointer-events: none;
+  }
+
+  /* focus */
+  .ch-row:focus-visible { outline: none; }
+  .ch-row:focus-visible .rect-ch { stroke-width: 1.5; }
+
+  /* ═════════ GLOSSARY DRAWER ═════════ */
+  .scrim {
+    position: fixed;
+    inset: 72px 0 0 0;
+    background: rgba(30, 30, 40, 0.28);
+    backdrop-filter: blur(2px);
+    -webkit-backdrop-filter: blur(2px);
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 260ms ease;
+    z-index: 40;
+  }
+  .scrim.is-open { opacity: 1; pointer-events: auto; }
+
+  .glossary {
+    position: fixed;
+    top: 72px;
+    right: 0;
+    bottom: 0;
+    width: min(480px, 92vw);
+    background: var(--card);
+    border-left: 1px solid var(--rule-mid);
+    transform: translateX(100%);
+    transition: transform 320ms cubic-bezier(.4,0,.2,1);
+    z-index: 50;
+    display: flex;
+    flex-direction: column;
+    box-shadow: -16px 0 40px -8px rgba(30, 30, 40, 0.18);
+  }
+  .glossary.is-open { transform: translateX(0); }
+
+  .gloss-head {
+    display: flex;
+    align-items: stretch;
+    border-bottom: 1px solid var(--rule);
+    background: var(--bg-tint);
+  }
+  .gloss-stamp {
+    background: var(--akvo);
+    color: #fff;
+    padding: 18px 22px 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+    min-width: 170px;
+  }
+  .gloss-stamp .num {
+    font-weight: 800;
+    font-size: 10.5px;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    opacity: 0.82;
+  }
+  .gloss-stamp .word {
+    font-weight: 900;
+    font-size: 22px;
+    letter-spacing: -0.01em;
+    line-height: 1;
+  }
+  .gloss-head-text {
+    padding: 18px 20px;
+    font-weight: 400;
+    font-style: italic;
+    font-size: 13px;
+    color: var(--ink-soft);
+    flex: 1;
+    align-self: center;
+    line-height: 1.3;
+  }
+  .gloss-close {
+    align-self: stretch;
+    width: 44px;
+    background: transparent;
+    border: none;
+    border-left: 1px solid var(--rule);
+    color: var(--ink-soft);
+    cursor: pointer;
+    font-family: "Mulish", sans-serif;
+    font-size: 22px;
+    font-weight: 400;
+    line-height: 1;
+    transition: background 150ms ease, color 150ms ease;
+  }
+  .gloss-close:hover {
+    background: var(--akvo);
+    color: #fff;
+  }
+
+  .gloss-body {
+    flex: 1 1 auto;
+    min-height: 0;
+    overflow-y: auto;
+    padding: 6px 28px 32px;
+    scrollbar-width: thin;
+    scrollbar-color: var(--ink-muted) transparent;
+  }
+  .gloss-body::-webkit-scrollbar { width: 6px; }
+  .gloss-body::-webkit-scrollbar-thumb { background: var(--ink-muted); border-radius: 3px; }
+
+  .gloss-group {
+    font-family: "Mulish", sans-serif;
+    font-weight: 800;
+    font-size: 10px;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    color: var(--akvo);
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin: 26px 0 6px;
+  }
+  .gloss-group::before {
+    content: "";
+    display: inline-block;
+    width: 12px; height: 12px;
+    background: var(--akvo);
+    flex-shrink: 0;
+  }
+  .gloss-group::after {
+    content: "";
+    flex: 1;
+    height: 1px;
+    background: var(--rule);
+  }
+  .gloss-group:first-child { margin-top: 18px; }
+
+  .gloss-entry {
+    padding: 14px 0;
+    border-bottom: 1px solid var(--rule);
+    display: grid;
+    grid-template-columns: 1fr auto;
+    column-gap: 12px;
+    row-gap: 8px;
+  }
+  .gloss-entry:last-child { border-bottom: none; }
+
+  .gloss-term {
+    font-family: "Mulish", sans-serif;
+    font-weight: 800;
+    font-size: 15.5px;
+    letter-spacing: -0.005em;
+    color: var(--ink);
+    line-height: 1.15;
+  }
+  .gloss-term .mono {
+    font-family: "IBM Plex Mono", monospace;
+    font-weight: 600;
+    font-size: 13px;
+    letter-spacing: 0;
+    color: var(--akvo);
+    background: rgba(72, 81, 164, 0.09);
+    padding: 1px 6px;
+  }
+
+  .gloss-tag {
+    font-family: "Mulish", sans-serif;
+    font-weight: 800;
+    font-size: 10px;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: #fff;
+    background: var(--akvo);
+    padding: 4px 8px 3px;
+    align-self: start;
+    margin-top: 1px;
+    white-space: nowrap;
+  }
+  .gloss-tag.tag-unit     { background: var(--warm-deep); }
+  .gloss-tag.tag-standard { background: var(--akvo); }
+  .gloss-tag.tag-field    { background: var(--norm-deep); }
+  .gloss-tag.tag-flag     { background: var(--glow-line); }
+  .gloss-tag.tag-source   { background: #3E3E4A; }
+  .gloss-tag.tag-process  { background: var(--teal-deep); }
+
+  .gloss-def {
+    grid-column: 1 / -1;
+    font-family: "Mulish", sans-serif;
+    font-weight: 400;
+    font-size: 13.5px;
+    line-height: 1.55;
+    color: var(--ink-soft);
+  }
+  .gloss-def .k {
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 12px;
+    color: var(--ink);
+    background: rgba(30, 30, 40, 0.06);
+    padding: 0 5px;
+  }
+  .gloss-def em {
+    font-style: italic;
+    color: var(--ink);
+  }
+
+  .gloss-foot {
+    padding: 14px 22px;
+    border-top: 1px solid var(--rule);
+    background: var(--bg-tint);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-family: "Mulish", sans-serif;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--ink-muted);
+  }
+  .gloss-foot .a-mark {
+    display: grid;
+    place-items: center;
+    width: 22px; height: 22px;
+    background: var(--akvo);
+    color: #fff;
+    font-weight: 900;
+    font-size: 13px;
+    line-height: 1;
+    border-radius: 2px;
+    letter-spacing: -0.02em;
+  }
+
+  @media (max-width: 1220px) {
+    .title { font-size: 18px; }
+    .title .stamp { font-size: 18px; padding: 6px 10px; }
+    .stage { gap: 56px; padding-left: 28px; padding-right: 28px; }
+  }
+  @media (max-width: 980px) {
+    .topbar { grid-template-columns: auto auto; gap: 12px; padding: 0 16px; }
+    .title { display: none; }
+  }
+</style>
+</head>
+<body>
+
+<!-- ═════════ HEADER ═════════ -->
+<header class="topbar">
+  <div class="doc-meta">
+    <div class="doc-mark" aria-hidden="true">A</div>
+    <div class="doc-lines">
+      <span class="k">GW-Connector</span>
+      <span class="v">Puntland · Rev 2026.04</span>
+    </div>
+  </div>
+
+  <h1 class="title">
+    Four constraints, paired with <span class="stamp">design.</span>
+  </h1>
+
+  <div class="topbar-right">
+    <button class="btn" id="glossary-btn" type="button" data-icon="→" aria-expanded="false" aria-controls="glossary">Glossary</button>
+    <button class="btn" id="reset-btn" type="button" data-icon="↻">Clear</button>
+  </div>
+</header>
+
+<!-- ═════════ STAGE ═════════ -->
+<main class="stage" id="stage" data-active="false">
+
+  <!-- LEFT: CHALLENGE × RESPONSE -->
+  <section class="panel panel-left">
+    <header class="panel-head">
+      <div class="panel-stamp"><span class="num">Ⅰ</span> Constraints</div>
+      <div class="panel-sub">Where the data fractures — and how it is set right.</div>
+      <div class="panel-meta">4 ×</div>
+    </header>
+
+    <div class="panel-body">
+    <svg class="diagram" viewBox="0 0 680 380" role="img" aria-label="Challenge to design response pairs">
+      <defs>
+        <marker id="ch-arrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+          <path d="M2 1L8 5L2 9" fill="none" stroke="context-stroke" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+        </marker>
+      </defs>
+
+      <g class="dimmable">
+        <text class="col-label" x="157" y="14" text-anchor="middle" dominant-baseline="central">CHALLENGE</text>
+        <text class="col-label" x="487" y="14" text-anchor="middle" dominant-baseline="central">DESIGN RESPONSE</text>
+        <line class="col-divider" x1="15" y1="24" x2="660" y2="24"/>
+      </g>
+
+      <!-- ROW 1 -->
+      <g class="ch-row dimmable" id="ch-vocabulary" data-key="vocabulary" tabindex="0" role="button" aria-label="Vocabulary fragmentation">
+        <text class="row-idx" x="0" y="68" text-anchor="start">01</text>
+        <rect class="rect-ch" x="15" y="36" width="285" height="64" rx="2"/>
+        <text class="t-title-ch" x="157" y="56" text-anchor="middle" dominant-baseline="central">Vocabulary fragmentation</text>
+        <text class="t-sub-ch" x="157" y="80" text-anchor="middle" dominant-baseline="central">three sources · no shared field names</text>
+        <line class="row-arrow" x1="300" y1="68" x2="315" y2="68" marker-end="url(#ch-arrow)"/>
+        <rect class="rect-resp" x="315" y="36" width="345" height="64" rx="2"/>
+        <text class="t-title-resp" x="487" y="56" text-anchor="middle" dominant-baseline="central">WaterML 2.0 schema anchor</text>
+        <text class="t-sub-resp" x="487" y="80" text-anchor="middle" dominant-baseline="central">mapped to a controlled vocabulary</text>
+      </g>
+
+      <!-- ROW 2 -->
+      <g class="ch-row dimmable" id="ch-baro" data-key="baro" tabindex="0" role="button" aria-label="Baro correction gap">
+        <text class="row-idx" x="0" y="150" text-anchor="start">02</text>
+        <rect class="rect-ch" x="15" y="118" width="285" height="64" rx="2"/>
+        <text class="t-title-ch" x="157" y="138" text-anchor="middle" dominant-baseline="central">Baro correction gap</text>
+        <text class="t-sub-ch" x="157" y="162" text-anchor="middle" dominant-baseline="central">pressure readings not cross-comparable</text>
+        <line class="row-arrow" x1="300" y1="150" x2="315" y2="150" marker-end="url(#ch-arrow)"/>
+        <rect class="rect-resp" x="315" y="118" width="345" height="64" rx="2"/>
+        <text class="t-title-resp" x="487" y="138" text-anchor="middle" dominant-baseline="central">Tiered correction logic</text>
+        <text class="t-sub-resp" x="487" y="162" text-anchor="middle" dominant-baseline="central">collocated → nearest station → flagged</text>
+      </g>
+
+      <!-- ROW 3 -->
+      <g class="ch-row dimmable" id="ch-datum" data-key="datum" tabindex="0" role="button" aria-label="Datum reference mismatch">
+        <text class="row-idx" x="0" y="232" text-anchor="start">03</text>
+        <rect class="rect-ch" x="15" y="200" width="285" height="64" rx="2"/>
+        <text class="t-title-ch" x="157" y="220" text-anchor="middle" dominant-baseline="central">Datum reference mismatch</text>
+        <text class="t-sub-ch" x="157" y="244" text-anchor="middle" dominant-baseline="central">reference datums vary across operators</text>
+        <line class="row-arrow" x1="300" y1="232" x2="315" y2="232" marker-end="url(#ch-arrow)"/>
+        <rect class="rect-resp" x="315" y="200" width="345" height="64" rx="2"/>
+        <text class="t-title-resp" x="487" y="220" text-anchor="middle" dominant-baseline="central">Per-site datum metadata</text>
+        <text class="t-sub-resp" x="487" y="244" text-anchor="middle" dominant-baseline="central">offset applied at ingestion · flag surfaced</text>
+      </g>
+
+      <!-- ROW 4 -->
+      <g class="ch-row dimmable" id="ch-temporal" data-key="temporal" tabindex="0" role="button" aria-label="Temporal heterogeneity">
+        <text class="row-idx" x="0" y="314" text-anchor="start">04</text>
+        <rect class="rect-ch" x="15" y="282" width="285" height="64" rx="2"/>
+        <text class="t-title-ch" x="157" y="302" text-anchor="middle" dominant-baseline="central">Temporal heterogeneity</text>
+        <text class="t-sub-ch" x="157" y="326" text-anchor="middle" dominant-baseline="central">daily → quarterly transmission cycles</text>
+        <line class="row-arrow" x1="300" y1="314" x2="315" y2="314" marker-end="url(#ch-arrow)"/>
+        <rect class="rect-resp" x="315" y="282" width="345" height="64" rx="2"/>
+        <text class="t-title-resp" x="487" y="302" text-anchor="middle" dominant-baseline="central">Freshness-aware delivery</text>
+        <text class="t-sub-resp" x="487" y="326" text-anchor="middle" dominant-baseline="central">data_age_hours per record · STALE triggered</text>
+      </g>
+    </svg>
+    </div>
+  </section>
+
+  <!-- RIGHT: ARCHITECTURE -->
+  <section class="panel panel-right">
+    <header class="panel-head">
+      <div class="panel-stamp"><span class="num">Ⅱ</span> Framework</div>
+      <div class="panel-sub">The connector — adapter, engine, schema, flag.</div>
+      <div class="panel-meta">[ mBGL ]</div>
+    </header>
+
+    <div class="panel-body">
+    <svg class="diagram" viewBox="0 0 680 410" role="img" aria-label="Groundwater connector framework architecture">
+      <defs>
+        <marker id="arch-arrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+          <path d="M2 1L8 5L2 9" fill="none" stroke="context-stroke" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+        </marker>
+      </defs>
+
+      <!-- Sources -->
+      <g class="dimmable" id="src-swalim">
+        <rect class="rect-src" x="15" y="55" width="140" height="56" rx="2"/>
+        <text class="t-title-ch" x="85" y="75" text-anchor="middle" dominant-baseline="central">SWALIM / FAO</text>
+        <text class="t-sub-ch" x="85" y="93" text-anchor="middle" dominant-baseline="central">GW_depth_m</text>
+      </g>
+      <g class="dimmable" id="src-wv">
+        <rect class="rect-src" x="15" y="165" width="140" height="56" rx="2"/>
+        <text class="t-title-ch" x="85" y="185" text-anchor="middle" dominant-baseline="central">World Vision</text>
+        <text class="t-sub-ch" x="85" y="203" text-anchor="middle" dominant-baseline="central">wt_below_casing</text>
+      </g>
+      <g class="dimmable" id="src-ingo3">
+        <rect class="rect-src" x="15" y="275" width="140" height="56" rx="2"/>
+        <text class="t-title-ch" x="85" y="295" text-anchor="middle" dominant-baseline="central">INGO 3</text>
+        <text class="t-sub-ch" x="85" y="313" text-anchor="middle" dominant-baseline="central">borehole_level</text>
+      </g>
+
+      <!-- merge rails -->
+      <g class="dimmable" id="merge-rails">
+        <line class="row-arrow" x1="155" y1="83"  x2="163" y2="83"  />
+        <line class="row-arrow" x1="155" y1="193" x2="163" y2="193" />
+        <line class="row-arrow" x1="155" y1="303" x2="163" y2="303" />
+        <line class="row-arrow" x1="163" y1="83"  x2="163" y2="303" />
+        <line class="row-arrow" x1="163" y1="86"  x2="193" y2="86"  marker-end="url(#arch-arrow)"/>
+      </g>
+
+      <!-- framework border -->
+      <g class="dimmable" id="framework">
+        <rect class="framework-border" x="178" y="30" width="300" height="350" rx="2"/>
+        <text class="framework-label" x="188" y="44" dominant-baseline="central">Connector framework</text>
+      </g>
+
+      <!-- Adapter registry -->
+      <g class="arch-box dimmable" id="arch-adapter">
+        <rect class="rect-arch" x="193" y="58" width="275" height="56" rx="2"/>
+        <text class="t-title-resp" x="330" y="78" text-anchor="middle" dominant-baseline="central">Adapter registry</text>
+        <text class="t-sub-resp" x="330" y="96" text-anchor="middle" dominant-baseline="central">extract · buffer · retry</text>
+      </g>
+      <line class="flow-arrow dimmable" x1="330" y1="114" x2="330" y2="130" marker-end="url(#arch-arrow)"/>
+
+      <!-- Normalization & QA engine -->
+      <g class="arch-box dimmable" id="arch-normalization">
+        <rect class="rect-norm" x="193" y="130" width="275" height="90" rx="2"/>
+        <text class="t-title-norm" x="330" y="149" text-anchor="middle" dominant-baseline="central">Normalization &amp; QA engine</text>
+        <rect class="bullet-pill" id="pill-baro"  x="209" y="159" width="166" height="16" rx="1"/>
+        <rect class="bullet-pill-tick" id="pill-baro-tick" x="209" y="159" width="3" height="16"/>
+        <rect class="bullet-pill" id="pill-datum" x="209" y="175" width="166" height="16" rx="1"/>
+        <rect class="bullet-pill-tick" id="pill-datum-tick" x="209" y="175" width="3" height="16"/>
+        <text class="t-sub-norm" id="bullet-baro"     x="217" y="167" dominant-baseline="central">▸ baro compensation</text>
+        <text class="t-sub-norm" id="bullet-datum"    x="217" y="183" dominant-baseline="central">▸ datum normalization</text>
+        <text class="t-sub-norm" id="bullet-temporal" x="217" y="199" dominant-baseline="central">▸ temporal resampling</text>
+      </g>
+      <line class="flow-arrow dimmable" x1="330" y1="220" x2="330" y2="238" marker-end="url(#arch-arrow)"/>
+
+      <!-- WaterML 2.0 schema -->
+      <g class="arch-box dimmable" id="arch-waterml">
+        <rect class="rect-arch" x="193" y="238" width="275" height="56" rx="2"/>
+        <text class="t-title-resp" x="330" y="258" text-anchor="middle" dominant-baseline="central">WaterML 2.0 schema</text>
+        <text class="t-sub-resp" x="330" y="276" text-anchor="middle" dominant-baseline="central">common field vocabulary</text>
+      </g>
+      <line class="flow-arrow dimmable" x1="330" y1="294" x2="330" y2="312" marker-end="url(#arch-arrow)"/>
+
+      <!-- Quality flag -->
+      <g class="arch-box dimmable" id="arch-quality">
+        <rect class="rect-arch" x="193" y="312" width="275" height="56" rx="2"/>
+        <text class="t-title-resp" x="330" y="332" text-anchor="middle" dominant-baseline="central">Quality flag assignment</text>
+        <text class="t-sub-resp" x="330" y="350" text-anchor="middle" dominant-baseline="central">VALID · STALE · BARO_UNCORRECTED</text>
+      </g>
+      <line class="flow-arrow dimmable" x1="478" y1="266" x2="500" y2="266" marker-end="url(#arch-arrow)"/>
+
+      <!-- Output -->
+      <g class="dimmable" id="output-mis">
+        <rect class="rect-out" x="500" y="238" width="155" height="56" rx="2"/>
+        <text class="t-title-out" x="577" y="258" text-anchor="middle" dominant-baseline="central">Puntland MIS</text>
+        <text class="t-sub-out" x="577" y="276" text-anchor="middle" dominant-baseline="central">water_level_mbgl</text>
+      </g>
+
+      <!-- Legend -->
+      <g class="dimmable" id="legend">
+        <rect x="178" y="389" width="10" height="10" fill="#A0431E"/>
+        <text class="legend-text" x="194" y="395" dominant-baseline="central">Sources</text>
+        <rect x="262" y="389" width="10" height="10" fill="#3A3580"/>
+        <text class="legend-text" x="278" y="395" dominant-baseline="central">Normalization</text>
+        <rect x="390" y="389" width="10" height="10" fill="#4851A4"/>
+        <text class="legend-text" x="406" y="395" dominant-baseline="central">Processing &amp; output</text>
+      </g>
+    </svg>
+    </div>
+  </section>
+
+  <!-- connector overlay -->
+  <svg class="connector-layer" id="connector-layer" preserveAspectRatio="none">
+    <defs>
+      <linearGradient id="connector-gradient" gradientUnits="userSpaceOnUse">
+        <stop offset="0%"   stop-color="#A0431E"/>
+        <stop offset="45%"  stop-color="#6F4760"/>
+        <stop offset="100%" stop-color="#4851A4"/>
+      </linearGradient>
+      <marker id="conn-arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="9" markerHeight="9" orient="auto-start-reverse">
+        <path d="M1.5 1.2L8.5 5L1.5 8.8" fill="none" stroke="#4851A4" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+      </marker>
+    </defs>
+    <circle class="connector-ring"   id="connector-ring"   cx="0" cy="0" r="6"/>
+    <circle class="connector-origin" id="connector-origin" cx="0" cy="0" r="2.5"/>
+    <path class="connector-path" id="connector-path" d="" marker-end="url(#conn-arrow)"/>
+  </svg>
+
+  <!-- callout -->
+  <div class="callout" id="callout">
+    <span class="callout-leader"></span>
+    <div class="callout-body">
+      <span class="callout-tag" id="callout-tag">OUTPUT</span>
+      <span class="callout-text" id="callout-text"></span>
+    </div>
+  </div>
+
+  <!-- hint -->
+  <div class="hint">select a constraint <em>1–4</em> · or click a row</div>
+
+  <!-- Akvo monogram -->
+  <div class="akvo-mark" aria-hidden="true">A</div>
+</main>
+
+<!-- ═════════ GLOSSARY ═════════ -->
+<div class="scrim" id="scrim" aria-hidden="true"></div>
+<aside class="glossary" id="glossary" aria-hidden="true" aria-labelledby="gloss-title" role="dialog">
+  <header class="gloss-head">
+    <div class="gloss-stamp">
+      <span class="num">Ⅲ · Appendix</span>
+      <span class="word" id="gloss-title">Glossary</span>
+    </div>
+    <div class="gloss-head-text">Terms of the brief — units, standards, source fields, processing stages and quality flags.</div>
+    <button class="gloss-close" id="gloss-close" type="button" aria-label="Close glossary">×</button>
+  </header>
+
+  <div class="gloss-body">
+
+    <div class="gloss-group">Units &amp; standards</div>
+    <div class="gloss-entry">
+      <div class="gloss-term"><span class="mono">mBGL</span></div>
+      <div class="gloss-tag tag-unit">Unit</div>
+      <div class="gloss-def">Metres Below Ground Level. The canonical vertical unit for groundwater depth — a positive number of metres beneath the surface at a site. All operator-native units resolve to <em>water_level_mbgl</em> once normalised.</div>
+    </div>
+    <div class="gloss-entry">
+      <div class="gloss-term">WaterML 2.0</div>
+      <div class="gloss-tag tag-standard">Standard</div>
+      <div class="gloss-def">OGC standard for exchange of hydrological time-series. Anchors the framework's controlled vocabulary and record structure — every source field is mapped to a WaterML-compliant slot before release downstream.</div>
+    </div>
+    <div class="gloss-entry">
+      <div class="gloss-term">Datum</div>
+      <div class="gloss-tag tag-standard">Reference</div>
+      <div class="gloss-def">The fixed vertical reference against which water-level measurements are expressed — commonly <em>top-of-casing</em>, <em>ground level</em>, or <em>mean sea level</em>. The connector stores one datum per site and applies the offset at ingestion.</div>
+    </div>
+
+    <div class="gloss-group">Source fields</div>
+    <div class="gloss-entry">
+      <div class="gloss-term"><span class="mono">GW_depth_m</span></div>
+      <div class="gloss-tag tag-source">SWALIM</div>
+      <div class="gloss-def">Native field used by SWALIM / FAO. Depth to groundwater in metres, relative to ground surface. Conceptually aligned with <span class="k">water_level_mbgl</span>.</div>
+    </div>
+    <div class="gloss-entry">
+      <div class="gloss-term"><span class="mono">wt_below_casing</span></div>
+      <div class="gloss-tag tag-source">World Vision</div>
+      <div class="gloss-def">Water-table depth measured from the top of the well casing. Requires a per-site casing-to-ground offset to normalise onto the common ground-referenced datum.</div>
+    </div>
+    <div class="gloss-entry">
+      <div class="gloss-term"><span class="mono">borehole_level</span></div>
+      <div class="gloss-tag tag-source">INGO 3</div>
+      <div class="gloss-def">Vertical position inside the borehole reported by the operator's logger. Interpretation depends on the transducer mount and the operator's datum convention, so the adapter preserves the raw value alongside provenance before normalisation.</div>
+    </div>
+
+    <div class="gloss-group">Processing</div>
+    <div class="gloss-entry">
+      <div class="gloss-term">Adapter registry</div>
+      <div class="gloss-tag tag-process">Stage 1</div>
+      <div class="gloss-def">Pluggable ingestion layer holding one adapter per operator. Each adapter handles <em>extract</em>, <em>buffer</em>, and <em>retry</em> against the source feed, preserving raw records and provenance for downstream stages.</div>
+    </div>
+    <div class="gloss-entry">
+      <div class="gloss-term">Barometric compensation</div>
+      <div class="gloss-tag tag-process">Correction</div>
+      <div class="gloss-def">Removal of atmospheric-pressure variation from a vented / absolute transducer reading. The tiered logic prefers a collocated baro sensor, falls back to the nearest station, and otherwise flags the record <span class="k">BARO_UNCORRECTED</span>.</div>
+    </div>
+    <div class="gloss-entry">
+      <div class="gloss-term">Datum normalisation</div>
+      <div class="gloss-tag tag-process">Correction</div>
+      <div class="gloss-def">Application of the per-site datum offset to convert operator-native depth values into the common ground-referenced frame. If site metadata is missing, <span class="k">DATUM_UNVERIFIED</span> is surfaced rather than silently propagated.</div>
+    </div>
+    <div class="gloss-entry">
+      <div class="gloss-term">Temporal resampling</div>
+      <div class="gloss-tag tag-process">Correction</div>
+      <div class="gloss-def">Alignment of irregular operator cadences (daily → quarterly) onto a shared time grid, preserving each record's <span class="k">data_age_hours</span> so freshness can be surfaced at delivery.</div>
+    </div>
+
+    <div class="gloss-group">Quality flags</div>
+    <div class="gloss-entry">
+      <div class="gloss-term"><span class="mono">VALID</span></div>
+      <div class="gloss-tag tag-flag">Flag</div>
+      <div class="gloss-def">Record passed all corrections and freshness checks. Safe for primary downstream use in the MIS.</div>
+    </div>
+    <div class="gloss-entry">
+      <div class="gloss-term"><span class="mono">STALE</span></div>
+      <div class="gloss-tag tag-flag">Flag</div>
+      <div class="gloss-def">Triggered when <span class="k">data_age_hours</span> exceeds the operator-specific freshness threshold. Record retained, but consumers should de-weight it in trend analysis.</div>
+    </div>
+    <div class="gloss-entry">
+      <div class="gloss-term"><span class="mono">BARO_UNCORRECTED</span></div>
+      <div class="gloss-tag tag-flag">Flag</div>
+      <div class="gloss-def">Applied when no barometric reference — neither collocated nor nearest-station — is available for a pressure reading. The raw value is preserved so corrections can be applied retrospectively.</div>
+    </div>
+    <div class="gloss-entry">
+      <div class="gloss-term"><span class="mono">DATUM_UNVERIFIED</span></div>
+      <div class="gloss-tag tag-flag">Flag</div>
+      <div class="gloss-def">Surfaced when per-site datum metadata is missing or inconsistent. The recorded offset remains in site metadata; the flag makes the gap visible rather than silently absorbed.</div>
+    </div>
+
+    <div class="gloss-group">Downstream</div>
+    <div class="gloss-entry">
+      <div class="gloss-term">Puntland MIS</div>
+      <div class="gloss-tag tag-source">Consumer</div>
+      <div class="gloss-def">The management-information system receiving normalised records from the connector. Consumes the common-vocabulary field <span class="k">water_level_mbgl</span> alongside each record's quality flags.</div>
+    </div>
+    <div class="gloss-entry">
+      <div class="gloss-term"><span class="mono">data_age_hours</span></div>
+      <div class="gloss-tag tag-field">Field</div>
+      <div class="gloss-def">Elapsed hours since the logger captured the observation. Computed at ingestion from the record timestamp; drives the <span class="k">STALE</span> flag at delivery time.</div>
+    </div>
+  </div>
+
+  <footer class="gloss-foot">
+    <span>Ⅲ · 16 terms</span>
+    <span style="display:inline-flex; align-items:center; gap:10px;">Esc to close <span class="a-mark">A</span></span>
+  </footer>
+</aside>
+
+<script>
+(() => {
+  const MAP = {
+    vocabulary: {
+      targetId: 'arch-waterml',
+      bulletId: null,
+      callout: { tag: 'RESOLUTION', text: 'all operators resolve to ', hi: 'water_level_mbgl' }
+    },
+    baro: {
+      targetId: 'arch-normalization',
+      bulletId: 'pill-baro',
+      callout: { tag: 'FLAG', text: '', hi: 'BARO_UNCORRECTED', after: ' · applied when reference absent' }
+    },
+    datum: {
+      targetId: 'arch-normalization',
+      bulletId: 'pill-datum',
+      callout: { tag: 'FLAG', text: '', hi: 'DATUM_UNVERIFIED', after: ' · offset stored per site' }
+    },
+    temporal: {
+      targetId: 'arch-quality',
+      bulletId: null,
+      callout: { tag: 'FLAG', text: '', hi: 'STALE', after: ' when data_age_hours exceeds threshold' }
+    }
+  };
+  const KEY_ORDER = ['vocabulary', 'baro', 'datum', 'temporal'];
+
+  const stage     = document.getElementById('stage');
+  const connector = document.getElementById('connector-layer');
+  const path      = document.getElementById('connector-path');
+  const origin    = document.getElementById('connector-origin');
+  const ring      = document.getElementById('connector-ring');
+  const gradient  = document.getElementById('connector-gradient');
+  const callout   = document.getElementById('callout');
+  const calloutTag  = document.getElementById('callout-tag');
+  const calloutText = document.getElementById('callout-text');
+  const resetBtn  = document.getElementById('reset-btn');
+  const chRows    = document.querySelectorAll('.ch-row');
+
+  let activeKey = null;
+  let timers = [];
+  const clearTimers = () => { timers.forEach(clearTimeout); timers = []; };
+  const schedule = (fn, ms) => { const id = setTimeout(fn, ms); timers.push(id); };
+
+  const sizeConnector = () => {
+    const r = stage.getBoundingClientRect();
+    connector.setAttribute('viewBox', `0 0 ${r.width} ${r.height}`);
+    connector.setAttribute('width',  r.width);
+    connector.setAttribute('height', r.height);
+  };
+
+  const endpoints = (key) => {
+    const sr = stage.getBoundingClientRect();
+    const row = document.getElementById('ch-' + key);
+    const respRect = row.querySelector('.rect-resp');
+    const target = document.getElementById(MAP[key].targetId);
+    const targetRect = target.querySelector('rect');
+    const r  = respRect.getBoundingClientRect();
+    const tr = targetRect.getBoundingClientRect();
+    return {
+      x1: r.right - sr.left,
+      y1: r.top + r.height / 2 - sr.top,
+      x2: tr.left - sr.left,
+      y2: tr.top + tr.height / 2 - sr.top
+    };
+  };
+
+  const drawPath = (pts) => {
+    const { x1, y1, x2, y2 } = pts;
+    const dx = Math.max(40, (x2 - x1) * 0.22);
+    const d  = `M ${x1} ${y1} C ${x1 + dx} ${y1}, ${x2 - dx} ${y2}, ${x2} ${y2}`;
+    path.setAttribute('d', d);
+    gradient.setAttribute('x1', x1);
+    gradient.setAttribute('y1', y1);
+    gradient.setAttribute('x2', x2);
+    gradient.setAttribute('y2', y2);
+
+    origin.setAttribute('cx', x1); origin.setAttribute('cy', y1);
+    ring.setAttribute('cx', x1);   ring.setAttribute('cy', y1);
+
+    const len = path.getTotalLength();
+    path.style.transition       = 'none';
+    path.style.strokeDasharray  = len;
+    path.style.strokeDashoffset = len;
+    path.classList.add('drawn');
+    origin.classList.add('drawn');
+    ring.classList.add('drawn');
+    void path.getBoundingClientRect();
+    path.style.transition       = 'stroke-dashoffset 420ms cubic-bezier(.4,0,.2,1)';
+    path.style.strokeDashoffset = 0;
+  };
+
+  const positionCallout = (targetEl) => {
+    const sr = stage.getBoundingClientRect();
+    const t = targetEl.querySelector('rect').getBoundingClientRect();
+    const centerX = t.left + t.width / 2 - sr.left;
+    const belowY  = t.bottom - sr.top + 20;
+    callout.style.left = centerX + 'px';
+    callout.style.top  = belowY  + 'px';
+  };
+
+  const setCalloutContent = (key) => {
+    const c = MAP[key].callout;
+    calloutTag.textContent = c.tag;
+    const safe = (s) => (s || '').replace(/&/g,'&amp;').replace(/</g,'&lt;');
+    calloutText.innerHTML =
+      safe(c.text) +
+      `<span class="mono-hi">${safe(c.hi)}</span>` +
+      safe(c.after || '');
+  };
+
+  const clearHighlights = () => {
+    document.querySelectorAll('.is-active').forEach(el => el.classList.remove('is-active'));
+    document.querySelectorAll('.bullet-pill.is-emphasized, .bullet-pill-tick.is-emphasized')
+            .forEach(el => el.classList.remove('is-emphasized'));
+  };
+
+  const activate = (key) => {
+    if (!(key in MAP)) return;
+    if (activeKey === key) { deactivate(); return; }
+    clearTimers();
+    const hadPrev = activeKey !== null;
+    activeKey = key;
+
+    const row = document.getElementById('ch-' + key);
+    const target = document.getElementById(MAP[key].targetId);
+    const bulletId = MAP[key].bulletId;
+
+    const doDraw = () => {
+      clearHighlights();
+      stage.setAttribute('data-active', 'true');
+      row.classList.add('is-active');
+      target.classList.add('is-active');
+
+      schedule(() => drawPath(endpoints(key)), 10);
+
+      if (bulletId) {
+        schedule(() => {
+          const pill = document.getElementById(bulletId);
+          const tick = document.getElementById(bulletId + '-tick');
+          if (pill) pill.classList.add('is-emphasized');
+          if (tick) tick.classList.add('is-emphasized');
+        }, 500);
+      }
+
+      schedule(() => {
+        setCalloutContent(key);
+        positionCallout(target);
+        callout.classList.add('visible');
+      }, 350);
+    };
+
+    if (hadPrev) {
+      path.style.transition = 'opacity 150ms ease';
+      path.style.opacity = '0';
+      origin.style.opacity = '0';
+      ring.style.opacity = '0';
+      callout.classList.remove('visible');
+      schedule(() => {
+        path.style.transition = 'none';
+        path.style.opacity = '1';
+        origin.style.opacity = '1';
+        ring.style.opacity = '1';
+        doDraw();
+      }, 160);
+    } else {
+      path.style.opacity = '1';
+      origin.style.opacity = '1';
+      ring.style.opacity = '1';
+      doDraw();
+    }
+  };
+
+  const deactivate = () => {
+    clearTimers();
+    activeKey = null;
+    stage.setAttribute('data-active', 'false');
+    clearHighlights();
+    path.style.transition = 'opacity 150ms ease';
+    path.style.opacity = '0';
+    origin.style.opacity = '0';
+    ring.style.opacity = '0';
+    callout.classList.remove('visible');
+  };
+
+  chRows.forEach(row => {
+    row.addEventListener('click', (e) => { e.stopPropagation(); activate(row.dataset.key); });
+    row.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); activate(row.dataset.key); }
+    });
+  });
+
+  resetBtn.addEventListener('click', (e) => { e.stopPropagation(); deactivate(); resetBtn.blur(); });
+
+  // ── Glossary ──
+  const glossary   = document.getElementById('glossary');
+  const glossBtn   = document.getElementById('glossary-btn');
+  const glossClose = document.getElementById('gloss-close');
+  const scrim      = document.getElementById('scrim');
+
+  const openGlossary = () => {
+    glossary.classList.add('is-open');
+    scrim.classList.add('is-open');
+    glossBtn.classList.add('is-active');
+    glossary.setAttribute('aria-hidden', 'false');
+    glossBtn.setAttribute('aria-expanded', 'true');
+  };
+  const closeGlossary = () => {
+    glossary.classList.remove('is-open');
+    scrim.classList.remove('is-open');
+    glossBtn.classList.remove('is-active');
+    glossary.setAttribute('aria-hidden', 'true');
+    glossBtn.setAttribute('aria-expanded', 'false');
+  };
+  const toggleGlossary = () => {
+    glossary.classList.contains('is-open') ? closeGlossary() : openGlossary();
+  };
+
+  glossBtn.addEventListener('click', (e) => { e.stopPropagation(); toggleGlossary(); glossBtn.blur(); });
+  glossClose.addEventListener('click', (e) => { e.stopPropagation(); closeGlossary(); });
+  scrim.addEventListener('click', closeGlossary);
+
+  document.addEventListener('click', (e) => {
+    if (e.target.closest('.ch-row')) return;
+    if (e.target.closest('.btn')) return;
+    if (e.target.closest('.glossary')) return;
+    deactivate();
+  });
+
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') {
+      if (glossary.classList.contains('is-open')) { closeGlossary(); return; }
+      deactivate();
+      return;
+    }
+    if (e.key.toLowerCase() === 'g' && !e.metaKey && !e.ctrlKey && !e.altKey) {
+      const tag = (e.target && e.target.tagName) || '';
+      if (tag === 'INPUT' || tag === 'TEXTAREA') return;
+      toggleGlossary();
+      return;
+    }
+    if (/^[1-4]$/.test(e.key)) {
+      const idx = parseInt(e.key, 10) - 1;
+      activate(KEY_ORDER[idx]);
+    }
+  });
+
+  const onResize = () => {
+    sizeConnector();
+    if (activeKey) {
+      const target = document.getElementById(MAP[activeKey].targetId);
+      drawPath(endpoints(activeKey));
+      positionCallout(target);
+    }
+  };
+  window.addEventListener('resize', onResize);
+  if (document.fonts && document.fonts.ready) {
+    document.fonts.ready.then(() => { sizeConnector(); if (activeKey) onResize(); });
+  }
+  sizeConnector();
+})();
+</script>
+</body>
+</html>
